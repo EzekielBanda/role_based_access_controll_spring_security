@@ -32,8 +32,9 @@ public class UserController {
         return userService.saveUser(userSignUpRequest);
     }
 
-
+    //Anyone having both Admin and Executive Role can view users
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') && hasRole('ROLE_EXECUTIVE')")
     public ResponseEntity<PagedModel<?>> getAllUsers(@PositiveOrZero  @RequestParam(value="page", defaultValue = "0") int page,
                                                       @Positive @RequestParam(value="size", defaultValue = "20") int size,
                                                      PagedResourcesAssembler<User> pagedResourcesAssembler){
@@ -45,6 +46,7 @@ public class UserController {
         return userService.getUser(authentication);
     }
 
+    //Only Admin or an Executive can update the user Role
     @PutMapping("update-role/{userName}/{role}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_EXECUTIVE')")
     public ResponseEntity<ApiResponse> updateUserRole(@PathVariable("userName") String userName,
@@ -53,6 +55,7 @@ public class UserController {
         return userService.updateUserRole(userName, role, currentUser);
     }
 
+    //Anyone having Admin Role can disable user account
     @PutMapping("disable-account/{userName}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> disableAccount(@PathVariable("userName") String userName){
